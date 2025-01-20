@@ -2,10 +2,11 @@ import Prompt from "@models/prompt";
 import { connectToDB } from "@utils/database";
 
 export const GET = async (_, { params }) => {
-  if (!params.id) return new Response("Missing id", { status: 500 });
+  const { id } = await params;
+  if (!id) return new Response("Missing id", { status: 500 });
   try {
     await connectToDB();
-    const prompt = await Prompt.findById(params.id).populate("creator");
+    const prompt = await Prompt.findById(id).populate("creator");
     if (!prompt) return new Response("Prompt not found", { status: 404 });
     return new Response(JSON.stringify(prompt), { status: 200 });
   } catch (error) {
@@ -15,9 +16,11 @@ export const GET = async (_, { params }) => {
 
 export const PATCH = async (request, { params }) => {
   const { prompt, tag } = await request.json();
+  const { id } = await params;
+  if (!id) return new Response("Missing id", { status: 500 });
   try {
     await connectToDB();
-    const existingPrompt = await Prompt.findById(params.id);
+    const existingPrompt = await Prompt.findById(id);
     if (!existingPrompt) {
       return new Response("Prompt not found", { status: 404 });
     }
@@ -31,10 +34,11 @@ export const PATCH = async (request, { params }) => {
 };
 
 export const DELETE = async (_, { params }) => {
-  if (!params.id) return new Response("Missing id", { status: 500 });
+  const { id } = await params;
+  if (!id) return new Response("Missing id", { status: 500 });
   try {
     await connectToDB();
-    await Prompt.findByIdAndDelete(params.id);
+    await Prompt.findByIdAndDelete(id);
 
     return new Response("Prompt deleted successfully", { status: 200 });
   } catch (error) {
